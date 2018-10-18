@@ -4,7 +4,7 @@ const auth = require('./auth');
 const client = new Discord.Client();
 
 
-client.on('ready', async () => {
+client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}`);
 });
 
@@ -102,7 +102,7 @@ async function initJson() {
     var input = {roles: []};
     console.log(input);
 
-    jsonfile.writeFile('./roles.json', input, { spaces: 4, EOL: '\r\n' })
+    await jsonfile.writeFile('./roles.json', input, { spaces: 4, EOL: '\r\n' })
         .catch(console.error);
 }
 
