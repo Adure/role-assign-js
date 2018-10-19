@@ -79,7 +79,7 @@ function createRole(rolename, colour, server) {
             jsonfile.writeFile('./roles.json', input, { spaces: 4, EOL: '\r\n' })
                 .then(console.log(`Added "${rolename}" to role list`))
                 .catch(console.error);
-        return `Created new role with name, "${rolename}".`;
+        return `Created new role with name "${rolename}"`;
         });
 }
 
@@ -95,6 +95,29 @@ function assignRole(role, user) {
             })
             .catch(console.error);
       }
+}
+
+function deleteRole(rolename, server) {
+    let role = server.roles.find(role => role.name === rolename);
+
+    getRoles()
+        .then(roleList => {
+            let index = roleList.indexOf(rolename);
+            roleList.splice(index, 1);
+            let input = {roles: roleList};
+
+            jsonfile.writeFile('./roles.json', input, { spaces: 4, EOL: '\r\n' })
+                .then(console.log(`Removed role "${role.name}" from list`))
+                .catch(console.error);
+        })
+        .catch(console.error);
+
+    return role.delete()
+        .then(outcome => {
+            console.log(`Deleted role "${role.name}"`);
+            return `Deleted role "${role.name}"`;
+        })
+        .catch(console.error);
 }
 
 function initJson() {
@@ -137,6 +160,22 @@ client.on('message', message => {
                     .then(outcome => {
                         message.channel.send(outcome);
                     })
+                    .catch(console.error);
+            })
+            .catch(console.error);
+    }
+
+    if (message.content.startsWith("/delete")) {
+        var roleName = message.content.replace("/delete", "").trim();
+        checkRoleExists(roleName, message.guild)
+            .then(checkRole => {
+                if (checkRole == false) {
+                    message.channel.send("That role doesn't exist");
+                    return;
+                }
+
+                deleteRole(roleName, message.guild)
+                    .then(outcome => message.channel.send(outcome))
                     .catch(console.error);
             })
             .catch(console.error);
