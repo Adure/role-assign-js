@@ -15,5 +15,9 @@
   "bugs": {
     "url": "https://github.com/Adure/role-assign-js/issues"
   },
-  "homepage": "https://github.com/Adure/role-assign-js#readme"
+  "homepage": "https://github.com/Adure/role-assign-js#readme",
+  "dependencies": {
+    "discord.js": "^11.4.2",
+    "jsonfile": "^5.0.0"
+  }
 }
