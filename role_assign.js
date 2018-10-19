@@ -8,8 +8,8 @@ client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}`);
 });
 
-async function getRoles() {
-    var roleList;
+function getRoles() {
+    let roleList;
 
     return jsonfile.readFile('./roles.json')
         .then(output => {
@@ -19,7 +19,7 @@ async function getRoles() {
         .catch(console.error);
 }
 
-async function checkRoleExists(rolename, server) {
+function checkRoleExists(rolename, server) {
     var roles = server.roles;
     var role = null;
     try {
@@ -28,8 +28,8 @@ async function checkRoleExists(rolename, server) {
         if (role == null) {
             return false;
         }
-        return await getRoles()
-            .then(async roleList => {
+        return getRoles()
+            .then(roleList => {
                 if (roleList.indexOf(rolename) >= 0) {
                     return role;
                 } else {
@@ -40,7 +40,7 @@ async function checkRoleExists(rolename, server) {
     }
 }
 
-async function checkRoleAvailable(rolename, server) {
+function checkRoleAvailable(rolename, server) {
     var roles = server.roles;
     var role = null;
     try {
@@ -49,8 +49,8 @@ async function checkRoleAvailable(rolename, server) {
         if (role != null) {
             return false;
         }
-        return await getRoles()
-            .then(async roleList => {
+        return getRoles()
+            .then(roleList => {
                 if (roleList.indexOf(rolename) === -1) {
                     return role;
                 } else {
@@ -61,36 +61,35 @@ async function checkRoleAvailable(rolename, server) {
     }
 }
 
-async function createRole(rolename, colour, server) {
-    var roleObj;
+function createRole(rolename, colour, server) {
     server.createRole({
         name: rolename,
         color: colour,
     })
         .then(role => {
-            console.log(`Created new role with name ${role.name} and color ${role.color}`)
+            console.log(`Created new role with name "${role.name}" and color ${role.color}`)
         })
         .catch(console.error);
 
-    return await getRoles()
+    return getRoles()
         .then(roleList => {
             roleList = roleList.concat(rolename);
-            var input = {roles: roleList};
+            let input = {roles: roleList};
 
             jsonfile.writeFile('./roles.json', input, { spaces: 4, EOL: '\r\n' })
-                .then(console.log(`Added ${rolename} to role list`))
+                .then(console.log(`Added "${rolename}" to role list`))
                 .catch(console.error);
-        return `Created new role with name, ${rolename}.`;
+        return `Created new role with name, "${rolename}".`;
         });
 }
 
-async function assignRole(role, user) {
+function assignRole(role, user) {
     if (user.roles.has(role.id)) {
         console.log(`${user.tag} already has role, ${role.name}`);
         return `you already have role, ${role.name}`;
       } else {
         return user.addRole(role)
-            .then(async success => {
+            .then(success => {
                 console.log(`Added role ${role.name} to ${user}`)
                 return `Added role ${role.name} to you`;
             })
@@ -98,27 +97,25 @@ async function assignRole(role, user) {
       }
 }
 
-async function initJson() {
+function initJson() {
     var input = {roles: []};
     console.log(input);
 
-    await jsonfile.writeFile('./roles.json', input, { spaces: 4, EOL: '\r\n' })
+    jsonfile.writeFile('./roles.json', input, { spaces: 4, EOL: '\r\n' })
         .catch(console.error);
 }
 
-client.on('message', async message => {
+client.on('message', message => {
     if (message.content.startsWith("/role")) {
         var roleName = message.content.replace("/role", "").trim();
-        return await checkRoleExists(roleName, message.guild)
-            .then(async checkRole => {
-                console.log(checkRole);
-
+        checkRoleExists(roleName, message.guild)
+            .then(checkRole => {
                 if (checkRole == false) {
                     message.channel.send("That role doesnt exist");
                     return;
                 } else {
-                    return await assignRole(checkRole, message.member)
-                        .then(async outcome => {
+                    assignRole(checkRole, message.member)
+                        .then(outcome => {
                             message.channel.send(outcome);
                         })
                         .catch(console.error);
@@ -129,14 +126,14 @@ client.on('message', async message => {
 
     if (message.content.startsWith("/create")) {
         var roleName = message.content.replace("/create", "").trim();
-        await checkRoleAvailable(roleName, message.guild)
-            .then(async checkRole => {
+        checkRoleAvailable(roleName, message.guild)
+            .then(checkRole => {
                 if (checkRole == false) {
                     message.channel.send("That role already exists");
                     return;
                 }
         
-                await createRole(roleName, 'BLUE', message.guild)
+                createRole(roleName, 'BLUE', message.guild)
                     .then(outcome => {
                         message.channel.send(outcome);
                     })
@@ -146,7 +143,7 @@ client.on('message', async message => {
     }
 
     if (message.content.startsWith("/init")) {
-        await initJson();
+        initJson();
     }
 });
 
