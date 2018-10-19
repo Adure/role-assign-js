@@ -148,7 +148,10 @@ client.on('message', message => {
     }
 
     if (message.content.startsWith("/create")) {
-        var roleName = message.content.replace("/create", "").trim();
+        let messageParts = message.content.match(/(?:[^\s"]+|"[^"]*")+/g);
+        var roleName = messageParts[1].replace(/"/g, "");
+        var colour = messageParts[2];
+
         checkRoleAvailable(roleName, message.guild)
             .then(checkRole => {
                 if (checkRole == false) {
@@ -156,7 +159,7 @@ client.on('message', message => {
                     return;
                 }
         
-                createRole(roleName, 'BLUE', message.guild)
+                createRole(roleName, colour, message.guild)
                     .then(outcome => {
                         message.channel.send(outcome);
                     })
