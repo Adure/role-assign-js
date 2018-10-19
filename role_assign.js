@@ -98,10 +98,10 @@ function assignRole(role, user) {
 }
 
 function initJson() {
-    var input = {roles: []};
-    console.log(input);
+    let input = {roles: []};
 
     jsonfile.writeFile('./roles.json', input, { spaces: 4, EOL: '\r\n' })
+        .then(console.log("Cleared roles.json"))
         .catch(console.error);
 }
 
